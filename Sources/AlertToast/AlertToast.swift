@@ -223,36 +223,42 @@ public struct AlertToast: View{
         self.title = title
     }
     
+    // MARK: - What to work on
     ///Banner from the bottom of the view
-    public var banner: some View{
-        VStack{
+    public var banner: some View {
+        VStack {
             Spacer()
             
             //Banner view starts here
             VStack(alignment: .leading, spacing: 10){
                 HStack{
-                    switch type{
-                    case .complete(let color):
-                        Image(systemName: "checkmark")
-                            .foregroundColor(color)
-                    case .error(let color):
-                        Image(systemName: "xmark")
-                            .foregroundColor(color)
-                    case .systemImage(let name, let color):
-                        Image(systemName: name)
-                            .foregroundColor(color)
-                    case .image(let name, let color):
-                        Image(name)
-                            .renderingMode(.template)
-                            .foregroundColor(color)
-                    case .loading:
-                        ActivityIndicator()
-                    case .regular:
-                        EmptyView()
+                    Group {
+                        switch type{
+                        case .complete(let color):
+                            Image(systemName: "checkmark")
+                                .foregroundColor(color)
+                        case .error(let color):
+                            Image(systemName: "xmark")
+                                .foregroundColor(color)
+                        case .systemImage(let name, let color):
+                            Image(systemName: name)
+                                .foregroundColor(color)
+                        case .image(let name, let color):
+                            Image(name)
+                                .renderingMode(.template)
+                                .foregroundColor(color)
+                        case .loading:
+                            ProgressView()
+                        case .regular:
+                            EmptyView()
+                        }
                     }
-                    
+                    .font(style?.subTitleFont ?? Font.subheadline)
+
                     Text(LocalizedStringKey(title ?? ""))
                         .font(style?.titleFont ?? Font.headline.bold())
+                    
+                    Spacer()
                 }
                 
                 if subTitle != nil{
@@ -262,14 +268,13 @@ public struct AlertToast: View{
             }
             .multilineTextAlignment(.leading)
             .textColor(style?.titleColor ?? nil)
-            .padding()
-            .frame(maxWidth: 400, alignment: .leading)
+            .padding(16)
             .alertBackground(style?.backgroundColor ?? nil)
             .cornerRadius(10)
             .padding([.horizontal, .bottom])
-        }
-    }
+        }    }
     
+    // MARK: - End
     ///HUD View
     public var hud: some View{
         Group{
@@ -292,7 +297,7 @@ public struct AlertToast: View{
                         .hudModifier()
                         .foregroundColor(color)
                 case .loading:
-                    ActivityIndicator()
+                    ProgressView()
                 case .regular:
                     EmptyView()
                 }
@@ -359,7 +364,7 @@ public struct AlertToast: View{
                     .padding(.bottom)
                 Spacer()
             case .loading:
-                ActivityIndicator()
+                ProgressView()
             case .regular:
                 EmptyView()
             }
@@ -628,7 +633,7 @@ fileprivate struct BackgroundModifier: ViewModifier{
                 .background(color)
         }else{
             content
-                .background(BlurView())
+                .background(.clear)
         }
     }
 }
@@ -678,7 +683,7 @@ public extension View{
     ///   - show: Binding<Bool>
     ///   - alert: () -> AlertToast
     /// - Returns: `AlertToast`
-    func toast(isPresenting: Binding<Bool>, duration: Double = 2, tapToDismiss: Bool = true, offsetY: CGFloat = 0, alert: @escaping () -> AlertToast, onTap: (() -> ())? = nil, completion: (() -> ())? = nil) -> some View{
+    func rawToast(isPresenting: Binding<Bool>, duration: Double = 2, tapToDismiss: Bool = true, offsetY: CGFloat = 0, alert: @escaping () -> AlertToast, onTap: (() -> ())? = nil, completion: (() -> ())? = nil) -> some View{
         modifier(AlertToastModifier(isPresenting: isPresenting, duration: duration, tapToDismiss: tapToDismiss, offsetY: offsetY, alert: alert, onTap: onTap, completion: completion))
     }
     
